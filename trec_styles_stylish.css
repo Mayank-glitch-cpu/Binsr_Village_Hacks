@@ -1,0 +1,354 @@
+/* TREC Report — Modern/Stylish Theme
+   --------------------------------------------------
+   Drop this file next to TREC_Report_All.html and either:
+   1) Rename it to trec_styles.css (to replace the default), or
+   2) Update the <link> href in the HTML to this filename.
+*/
+
+/* ---------- Design Tokens ---------- */
+:root{
+  --bg: #f6f7fb;
+  --paper: #ffffff;
+  --ink: #111827;               /* near-black */
+  --muted: #374151;             /* slate */
+  --rule: #1f2937;              /* slate-800 */
+  --accent: #0ea5e9;            /* sky-500 */
+  --accent-600: #0284c7;        /* sky-600 */
+  --accent-50: #e0f2fe;         /* sky-100/50 */
+  --ring: rgba(14,165,233,.35); /* focus ring */
+  --shadow: 0 10px 30px rgba(2,6,23,.12);
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-xs: 8px;
+  --page-width: 8.5in;
+  --page-height: 11in;
+  --margin: 0.6in;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+  --serif: "Times New Roman", Times, Georgia, serif;
+}
+
+/* ---------- Print Page Setup ---------- */
+@page { size: letter; margin: 0; }
+
+/* ---------- Global ---------- */
+*{ box-sizing: border-box; }
+html, body{
+  height: 100%;
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(1200px 600px at 20% -10%, #dbeafe 0%, transparent 40%),
+    radial-gradient(900px 500px at 110% 10%, #e9d5ff 0%, transparent 45%),
+    var(--bg);
+  font-family: var(--serif);
+  line-height: 1.45;
+}
+
+/* ---------- Page Card ---------- */
+.page{
+  width: var(--page-width);
+  min-height: var(--page-height);
+  margin: 1.2rem auto;
+  background: var(--paper);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: clip;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(2,6,23,.06);
+}
+.content{ padding: var(--margin); padding-bottom: calc(var(--margin) * .7); flex: 1; }
+
+/* Accent top edge */
+.page::before{
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 5px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-600));
+}
+
+/* ---------- Headings ---------- */
+.notice-title,
+.section-title,
+.addl-heading{
+  font-family: var(--sans);
+  letter-spacing: .4px;
+}
+
+.notice-title{
+  font-size: 11pt;
+  font-weight: 800;
+  text-transform: uppercase;
+  text-align: center;
+  margin: 2px 0 12px;
+  text-decoration: none;
+  position: relative;
+}
+.notice-title::after{
+  content: "";
+  display: block;
+  margin: 8px auto 0;
+  width: clamp(140px, 40%, 360px);
+  height: 3px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-600));
+}
+
+.section-title{
+  font-size: 15.5pt;
+  font-weight: 800;
+  text-transform: uppercase;
+  text-align: center;
+  margin: 10px 0 10px;
+  position: relative;
+}
+.section-title::after{
+  content: "";
+  display: block;
+  width: 90px;
+  height: 4px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-600));
+  margin: 6px auto 0;
+}
+
+.addl-heading{
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  text-align: center;
+  letter-spacing: .6px;
+}
+
+/* ---------- Rules & Lines ---------- */
+.double-rule-strong{
+  height: 8px;
+  margin: 6px 0 10px;
+  border-top: 2px solid var(--rule);
+  border-bottom: 2px solid var(--rule);
+  opacity: .9;
+}
+.single-rule{ border-top: 3px solid var(--rule); margin: 6px 0 8px; }
+
+/* ---------- Legend ---------- */
+.legend{
+  display: flex;
+  gap: 22px;
+  font-family: var(--sans);
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.legend b{
+  color: var(--ink);
+  font-weight: 800;
+}
+
+/* ---------- Status Bar (I/NI/NP/D) ---------- */
+.status-bar{
+  border: 2px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  background: linear-gradient(180deg, #fff, #f8fafc);
+}
+.status-row{
+  display: grid;
+  grid-template-columns: repeat(4, 18px);
+  column-gap: 8px;
+  width: 100px;            /* equals --checksW */
+  justify-items: center;
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: .6px;
+  color: var(--ink);
+  margin-left: -12px;      /* keeps alignment with checkbox columns */
+}
+
+/* ---------- Item Blocks ---------- */
+.item{ margin: 8px 0 12px; }
+.item-head{
+  display: grid;
+  grid-template-columns: 100px 1fr; /* matches --checksW */
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 0;
+}
+.item-title{
+  font-size: 14.2px;
+  font-weight: 800;
+  font-family: var(--sans);
+}
+.item-title .code{
+  font-weight: 900;
+  margin-right: 4px;
+}
+
+/* Checkboxes */
+.checks{
+  display: grid;
+  grid-template-columns: repeat(4, 18px);
+  gap: 8px;
+  align-items: center;
+}
+.checks input[type="checkbox"]{
+  width: 16px; height: 16px;
+  border-radius: 4px;
+  accent-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(2,6,23,.08) inset;
+}
+
+/* ---------- Subcategory Inline Fields ---------- */
+.sub-inline,
+.comments-inline{
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 8px;
+  align-items: baseline;
+  margin-left: calc(100px + 26px);
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+.sublabel,
+.comments-label{
+  font-style: italic;
+  font-size: 12px;
+  color: var(--muted);
+  position: relative;
+}
+.sublabel::after{ content: ":"; padding-left: 1px; }
+
+/* Fill areas (no underlines, but give a subtle card look) */
+.linefill,
+.comments{
+  min-height: 18px;
+  background: #f8fafc;
+  border: 1px solid rgba(2,6,23,.08);
+  border-radius: var(--radius-xs);
+  padding: 6px 8px;
+  transition: box-shadow .15s ease, border-color .15s ease, background-color .15s ease;
+}
+.linefill[contenteditable="true"]:focus,
+.comments:focus{
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--ring);
+  background: #fff;
+}
+
+/* Existing .field inputs (if present on some pages) */
+.field{
+  width: 100%;
+  font: inherit;
+  padding: 6px 8px;
+  border-radius: var(--radius-xs);
+  border: 1px solid rgba(2,6,23,.12);
+  background: #f8fafc;
+  transition: box-shadow .15s ease, border-color .15s ease;
+}
+.field:focus{
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--ring);
+  background: #fff;
+}
+
+/* Underlabel (if used) */
+.underlabel{
+  margin-top: 4px;
+  font-size: 11.2px;
+  color: var(--muted);
+}
+
+/* ---------- Additional Information Box ---------- */
+.addl-box{
+  border: 1px solid rgba(2,6,23,.12);
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, #fff, #fbfdff);
+  box-shadow: 0 4px 14px rgba(2,6,23,.06) inset;
+}
+.addl-text{ font-family: var(--serif); font-size: 12.5px; line-height: 1.55; }
+
+/* ---------- Paragraphs & Lists ---------- */
+.para{ font-size: 13px; text-align: justify; color: var(--ink); }
+ul{ margin: 0 0 8px 1.25rem; padding: 0; font-size: 13px; }
+li{ margin: 4px 0; }
+.intro-underline{
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ---------- Page Count ---------- */
+.pagecount-center{
+  text-align: center;
+  margin-top: 8px;
+  font-family: var(--sans);
+  color: var(--muted);
+}
+.pagecount-center input{
+  width: 0.7in;
+  border: none;
+  border-bottom: 1px dashed var(--rule);
+  padding: 2px 4px;
+  text-align: center;
+  background: transparent;
+  font: inherit;
+}
+
+/* ---------- Footer ---------- */
+.footer{ margin: 0 var(--margin) var(--margin); }
+.footline{
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  padding-top: 10px;
+  margin-top: 12px;
+  border-top: 1px solid rgba(2,6,23,.12);
+}
+.muted{ color: var(--muted); }
+.footright{ text-align: right; white-space: nowrap; }
+
+/* ---------- Print Cleanup ---------- */
+@media print{
+  body{
+    background: #fff;
+  }
+  .page{
+    margin: 0 auto;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+  }
+  .page::before{ content: none; }
+  .addl-box{ box-shadow: none; }
+}
+
+
+
+/* --- Page 1 header tweaks: logo + bold title side-by-side --- */
+.heading-row{
+  display: flex;
+  align-items: flex-end;       /* align baseline with title */
+  gap: 14px;                   /* tight spacing */
+  margin-bottom: 4px;
+}
+.trec-logo img{
+  display: block;
+  height: 56px;                /* consistent logo size */
+  width: auto;
+}
+.title{
+  font-family: var(--sans);
+  font-size: 28px;
+  font-weight: 900;            /* stronger bold */
+  letter-spacing: .6px;
+  line-height: 1.05;
+  margin: 0;                   /* remove extra top spacing */
+  white-space: nowrap;         /* keep on one line */
+}
+.title-spacer{ display:none; } /* remove extra column if present */
