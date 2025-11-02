@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TREC Report Generator</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231a1a2e'/%3E%3Ctext x='50' y='70' font-family='Georgia,serif' font-size='60' font-weight='bold' fill='%23c9a961' text-anchor='middle'%3ET%3C/text%3E%3C/svg%3E">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', 'Garamond', serif;
+            background: #f5f5f0;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.03) 2px, rgba(0,0,0,.03) 4px);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #1a1a2e;
+            border-radius: 4px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 100%);
+            color: #ffffff;
+            padding: 35px 30px;
+            text-align: center;
+            border-bottom: 4px solid #0f3460;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(to right, transparent, #c9a961, transparent);
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            margin-bottom: 8px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            text-transform: uppercase;
+        }
+
+        .header p {
+            font-size: 0.95em;
+            opacity: 0.85;
+            font-weight: 300;
+            letter-spacing: 0.3px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            min-height: calc(100vh - 200px);
+        }
+
+        .sidebar {
+            background: #fafafa;
+            padding: 30px;
+            border-right: 2px solid #e8e8e8;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .upload-section {
+            background: #ffffff;
+            border: 1px solid #d0d0d0;
+            border-radius: 2px;
+            padding: 25px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .upload-area {
+            border: 2px dashed #4a5568;
+            border-radius: 2px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fafafa;
+            position: relative;
+        }
+
+        .upload-area:hover {
+            border-color: #1a1a2e;
+            background: #f5f5f5;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .upload-area.dragover {
+            border-color: #0f3460;
+            background: #f0f0f0;
+            border-style: solid;
+            box-shadow: inset 0 0 0 2px #c9a961;
+        }
+
+        .upload-icon {
+            font-size: 42px;
+            margin-bottom: 15px;
+            color: #4a5568;
+            font-weight: 300;
+        }
+
+        .upload-text {
+            color: #1a1a2e;
+            font-size: 1em;
+            margin-bottom: 10px;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+        }
+
+        .upload-hint {
+            color: #6b7280;
+            font-size: 0.85em;
+            font-style: italic;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .file-info {
+            margin-top: 15px;
+            padding: 12px 14px;
+            background: #f0f4f8;
+            border: 1px solid #cbd5e0;
+            border-left: 4px solid #0f3460;
+            border-radius: 2px;
+            display: none;
+        }
+
+        .file-info.active {
+            display: block;
+        }
+
+        .file-info .file-name {
+            font-weight: 500;
+            color: #1a1a2e;
+            margin-bottom: 5px;
+            font-size: 0.95em;
+            letter-spacing: 0.1px;
+        }
+
+        .file-info .file-size {
+            color: #6b7280;
+            font-size: 0.85em;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: 1px solid #1a1a2e;
+            border-radius: 2px;
+            font-size: 0.85em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background: #1a1a2e;
+            color: #ffffff;
+            border-color: #1a1a2e;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #0f3460;
+            border-color: #0f3460;
+            box-shadow: 0 2px 8px rgba(26, 26, 46, 0.3);
+        }
+
+        .btn-primary:active:not(:disabled) {
+            background: #16213e;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #9ca3af;
+            border-color: #9ca3af;
+        }
+
+        .btn-secondary {
+            background: #ffffff;
+            color: #1a1a2e;
+            border-color: #9ca3af;
+        }
+
+        .btn-secondary:hover {
+            background: #f5f5f5;
+            border-color: #6b7280;
+            color: #0f3460;
+        }
+
+        .status-section {
+            background: #ffffff;
+            border: 1px solid #d0d0d0;
+            border-radius: 2px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .status-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1a1a2e;
+            font-size: 1em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #1a1a2e;
+            padding-bottom: 8px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            color: #4a5568;
+            font-size: 0.9em;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-icon {
+            width: 22px;
+            height: 22px;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            border: 1px solid;
+            flex-shrink: 0;
+        }
+
+        .status-icon.pending {
+            background: #fff8e1;
+            color: #f57c00;
+            border-color: #ffc107;
+        }
+
+        .status-icon.loading {
+            background: #e3f2fd;
+            color: #1976d2;
+            border-color: #2196f3;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .status-icon.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-color: #4caf50;
+        }
+
+        .status-icon.error {
+            background: #ffebee;
+            color: #c62828;
+            border-color: #f44336;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .preview-section {
+            padding: 30px;
+            overflow-y: auto;
+            background: #fafafa;
+            max-height: calc(100vh - 200px);
+        }
+
+        .preview-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #9ca3af;
+            text-align: center;
+            padding: 60px;
+            background: #ffffff;
+            border: 2px dashed #d0d0d0;
+            border-radius: 2px;
+        }
+
+        .preview-placeholder .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.4;
+            color: #6b7280;
+        }
+
+        .preview-placeholder h3 {
+            font-size: 1.3em;
+            margin-bottom: 12px;
+            color: #4a5568;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .preview-placeholder p {
+            font-size: 0.95em;
+            color: #6b7280;
+            line-height: 1.6;
+            max-width: 500px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #e8e8e8;
+            border-top: 3px solid #1a1a2e;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 14px 16px;
+            border-radius: 2px;
+            margin: 15px 0;
+            display: none;
+            border: 1px solid #ef5350;
+            border-left: 4px solid #c62828;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .error-message.active {
+            display: block;
+        }
+
+        #previewFrame {
+            width: 100%;
+            border: 1px solid #d0d0d0;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 2px;
+            display: none;
+            min-height: 800px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e8e8e8;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .progress-bar.active {
+            display: block;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #1a1a2e;
+            width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 4px rgba(26, 26, 46, 0.3);
+        }
+
+        .loading-text {
+            color: #4a5568;
+            font-size: 1em;
+            margin-top: 15px;
+            letter-spacing: 0.2px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>TREC Report Generator</h1>
+            <p>Property Inspection Document Management System</p>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="upload-section">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📄</div>
+                        <div class="upload-text">Upload Inspection Document</div>
+                        <div class="upload-hint">Click to browse or drag & drop inspection.json</div>
+                        <input type="file" id="fileInput" accept=".json" />
+                    </div>
+                    
+                    <div class="file-info" id="fileInfo">
+                        <div class="file-name" id="fileName"></div>
+                        <div class="file-size" id="fileSize"></div>
+                    </div>
+
+                    <div class="progress-bar" id="progressBar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+
+                    <div class="error-message" id="errorMessage"></div>
+
+                    <div class="action-buttons" style="margin-top: 20px;">
+                        <button class="btn btn-primary" id="generateBtn" disabled>
+                            <span>Generate Report</span>
+                        </button>
+                        <button class="btn btn-primary" id="downloadPdfBtn" disabled>
+                            <span>Download PDF</span>
+                        </button>
+                        <button class="btn btn-secondary" id="resetBtn">
+                            <span>Reset</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="status-section">
+                    <div class="status-title">Status</div>
+                    <div class="status-item">
+                        <div class="status-icon pending" id="statusUpload">!</div>
+                        <span>Upload inspection.json</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-icon pending" id="statusTemplate">!</div>
+                        <span>Load TREC template</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-icon pending" id="statusFill">!</div>
+                        <span>Fill template with data</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-icon pending" id="statusPdf">!</div>
+                        <span>PDF ready</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="preview-section">
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <div class="loading-text" id="loadingText">Processing your report...</div>
+                </div>
+
+                <div class="preview-placeholder" id="placeholder">
+                    <div class="icon">📋</div>
+                    <h3>Document Preview</h3>
+                    <p>Upload an inspection.json file to generate and preview the filled TREC Property Inspection Report</p>
+                    <p style="margin-top: 24px; font-size: 0.85em; color: #6b7280; font-style: italic;">
+                        <strong>Note:</strong> If you encounter CORS errors, please use a local web server.<br>
+                        Run: <code style="background: #f5f5f5; padding: 3px 8px; border-radius: 2px; border: 1px solid #e0e0e0; font-family: 'Courier New', monospace;">python server.py</code>
+                    </p>
+                </div>
+
+                <iframe id="previewFrame"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main application script -->
+    <script src="app.js"></script>
+</body>
+</html>
